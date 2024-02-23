@@ -48,8 +48,7 @@ public class SecurityConfiguration {
             .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests((authorizationManagerRequestMatcherRegistry) -> {
                 authorizationManagerRequestMatcherRegistry
-                        .requestMatchers("/api/authentication/**").permitAll()
-                        .requestMatchers("api/user/**").hasAuthority("1")
+                        .requestMatchers("/api/**").permitAll()
                 ;
             });
 

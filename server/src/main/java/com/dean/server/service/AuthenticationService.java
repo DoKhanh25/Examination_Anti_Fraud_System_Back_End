@@ -26,10 +26,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 @Service
-public class AccountService {
-    public static final int COLUMN_INDEX_USERNAME = 1;
-    public static final int COLUMN_INDEX_PASSWORD = 2;
-    public static final int COLUMN_INDEX_NAME = 3;
+public class AuthenticationService {
 
 
 
@@ -45,7 +42,7 @@ public class AccountService {
     @Autowired
     private  JwtUtil jwtUtil;
 
-    Logger logger = LoggerFactory.getLogger(AccountService.class);
+    Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 
     public UserDTO findUserByUserName(String username){
@@ -132,116 +129,7 @@ public class AccountService {
         }
     }
 
-    public ResponseEntity<?> saveAccountsByExcel(MultipartFile file){
 
-        ResultDTO resultDTO = new ResultDTO();
-
-        OPCPackage pkg = null;
-        XSSFWorkbook xlsxbook = null;
-        InputStream xlsxContentStream = null;
-        try {
-            xlsxContentStream = file.getInputStream();
-            pkg = OPCPackage.open(xlsxContentStream);
-            xlsxbook = new XSSFWorkbook(pkg);
-
-
-
-            XSSFSheet sheet = xlsxbook.getSheetAt(0);
-
-            Iterator<Row> itr = sheet.iterator();
-
-            while (itr.hasNext()) {
-                Row row = itr.next();
-                logger.info(String.valueOf(row.getRowNum()));
-                if(row.getRowNum() == 0){
-                    continue;
-                }
-
-                Iterator<Cell> cellIterator = row.cellIterator();
-
-                RegisterDTO registerDTO = new RegisterDTO();
-
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    Object cellValue = getCellValue(cell);
-
-
-                    int columnIndex = cell.getColumnIndex();
-                    switch (columnIndex){
-                        case COLUMN_INDEX_USERNAME:
-                            registerDTO.setUsername((String) cellValue);
-                            break;
-                        case COLUMN_INDEX_PASSWORD:
-                            registerDTO.setPassword((String) cellValue);
-                            break;
-                        case COLUMN_INDEX_NAME:
-                            registerDTO.setName((String) cellValue);
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-                UserEntity userEntity = new UserEntity();
-                userEntity.setName(registerDTO.getName());
-                userEntity.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-                userEntity.setUsername(registerDTO.getUsername());
-                userEntity.setRole((short) 1);
-
-                logger.info(registerDTO.getUsername());
-
-                userRepository.save(userEntity);
-
-            }
-
-            resultDTO.setErrorCode("0");
-            resultDTO.setMessage("success");
-            resultDTO.setData(null);
-            return ResponseEntity.status(HttpStatus.OK).body(resultDTO);
-        } catch (Exception e) {
-            resultDTO.setErrorCode("-1");
-            resultDTO.setMessage("fail");
-            resultDTO.setData(null);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(resultDTO);
-        } finally {
-            try {
-                xlsxContentStream.close();
-                xlsxbook.close();
-            } catch (Exception ex){
-                logger.info(ex.getMessage());
-            }
-
-        }
-    }
-
-    private static Object getCellValue(Cell cell) {
-        CellType cellType = cell.getCellTypeEnum();
-        Object cellValue = null;
-        switch (cellType) {
-            case BOOLEAN:
-                cellValue = cell.getBooleanCellValue();
-                break;
-            case FORMULA:
-                Workbook workbook = cell.getSheet().getWorkbook();
-                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-                cellValue = evaluator.evaluate(cell).getNumberValue();
-                break;
-            case NUMERIC:
-                cellValue = cell.getNumericCellValue();
-                break;
-            case STRING:
-                cellValue = cell.getStringCellValue();
-                break;
-            case _NONE:
-            case BLANK:
-            case ERROR:
-                break;
-            default:
-                break;
-        }
-
-        return cellValue;
-    }
 
 
 
