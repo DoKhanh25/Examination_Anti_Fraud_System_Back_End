@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExamParticipant {
+public class ExamParticipantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
@@ -19,8 +19,8 @@ public class ExamParticipant {
     UserEntity student;
 
     @ManyToOne
-    @JoinColumn(name = "exam_id")
-    Course course;
+    @JoinColumn(name = "exam_problem_id")
+    ExamProblemEntity examProblem;
 
 
 }

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "user_account")
 @Data
@@ -23,15 +24,21 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "account_name")
     String name;
+
     @Column(name = "account_username", unique = true)
     String username;
+
     @Column(name = "account_password")
     String password;
+
     @Column(name = "account_role")
     Short role;
 
     @Column(name = "account_masv", unique = true)
     String msv;
+
+    @OneToMany(mappedBy = "student")
+    Set<ExamParticipantEntity> examParticipantEntitySet;
 
 
     @Override
