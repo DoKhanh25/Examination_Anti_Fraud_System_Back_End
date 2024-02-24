@@ -1,6 +1,7 @@
 package com.dean.server.service;
 
 
+import com.dean.server.dto.ExamInformationDTO;
 import com.dean.server.dto.ExamProblemDTO;
 import com.dean.server.dto.ResultDTO;
 import com.dean.server.entity.ExamParticipantEntity;
@@ -9,6 +10,8 @@ import com.dean.server.entity.UserEntity;
 import com.dean.server.repository.ExamParticipantRepository;
 import com.dean.server.repository.ExamProblemRepository;
 import com.dean.server.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.util.*;
 
 @Service
 public class ExamProblemService {
+    Logger logger = LoggerFactory.getLogger(ExamProblemService.class);
 
     @Autowired
     private ExamProblemRepository examProblemRepository;
@@ -74,5 +78,27 @@ public class ExamProblemService {
         return resultDTO;
 
 
+    }
+
+    public ResultDTO getAllExamProblem(){
+        ResultDTO resultDTO = new ResultDTO();
+        resultDTO.setErrorCode("0");
+        List<List<Object>> listData = examProblemRepository.getAllExamProblemWithStudent();
+        List<ExamInformationDTO> examInformationDTOList = new ArrayList<>();
+        for (List<Object> objectList: listData){
+            ExamInformationDTO examInformationDTO = new ExamInformationDTO();
+            examInformationDTO.setCreateBy((String) objectList.get(0));
+            examInformationDTO.setExamDescription((String) objectList.get(1));
+            examInformationDTO.setExamTitle((String) objectList.get(2));
+            examInformationDTO.setStartTime((Date) objectList.get(3));
+            examInformationDTO.setEndTime((Date) objectList.get(4));
+            examInformationDTO.setUsername((String) objectList.get(5));
+            examInformationDTO.setDuration((Long) ((Duration) objectList.get(6)).toMillis());
+            examInformationDTO.setExamSolution((String) objectList.get(7));
+
+            examInformationDTOList.add(examInformationDTO);
+        }
+        resultDTO.setData(examInformationDTOList);
+        return resultDTO;
     }
 }
