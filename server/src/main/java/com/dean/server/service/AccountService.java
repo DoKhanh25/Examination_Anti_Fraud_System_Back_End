@@ -149,16 +149,12 @@ public class AccountService {
         return cellValue;
     }
 
-    public ResponseEntity<?> getAllAccount(){
-        List<UserEntity> userEntityList = userRepository.findAll();
-        List<String> usernameList = new ArrayList<>();
+    public ResponseEntity<?> getAllStudentAccount(){
+
+        List<String> usernameList = userRepository.getAllUsernameByRole((short) 1);
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setErrorCode("0");
 
-
-        for(UserEntity user : userEntityList){
-            usernameList.add(user.getUsername());
-        }
         resultDTO.setData(usernameList);
 
         return ResponseEntity.status(HttpStatus.OK).body(resultDTO);

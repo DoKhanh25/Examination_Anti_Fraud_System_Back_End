@@ -13,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ExamProblemService {
@@ -33,6 +32,14 @@ public class ExamProblemService {
         ExamProblemEntity examProblemEntity = new ExamProblemEntity();
         Set<ExamParticipantEntity> examParticipantEntitySet = new HashSet<>();
 
+
+        if(examProblemDTO.getExamParticipantSet() == null){
+            resultDTO.setErrorCode("-1");
+            resultDTO.setMessage("No Participant Data");
+            return resultDTO;
+        }
+
+
         examProblemEntity.setExamTitle(examProblemDTO.getExamTitle());
         examProblemEntity.setExamDescription(examProblemDTO.getExamDescription());
         examProblemEntity.setCreateBy(examProblemDTO.getCreateBy());
@@ -42,18 +49,23 @@ public class ExamProblemService {
 
 
         for(String student : examProblemDTO.getExamParticipantSet()){
-            UserEntity userEntity = userRepository.findByUsername(student);
-            if(userEntity != null){
-                ExamParticipantEntity examParticipantEntity = new ExamParticipantEntity();
-                examParticipantEntity.setStudent(userEntity);
-                examParticipantEntity.setExamProblem(examProblemEntity);
+            UserEntity userEntityTemp = userRepository.findByUsername(student);
+            if(userEntityTemp != null){
+                ExamParticipantEntity examParticipantEntityTemp = new ExamParticipantEntity();
+                examParticipantEntityTemp.setStudent(userEntityTemp);
+                examParticipantEntitySet.add(examParticipantEntityTemp);
 
-                examParticipantEntitySet.add(examParticipantEntity);
             }
         }
         examProblemEntity.setExamParticipantEntitySet(examParticipantEntitySet);
 
         ExamProblemEntity examProblemEntityResult = examProblemRepository.save(examProblemEntity);
+
+        for(ExamParticipantEntity e : examParticipantEntitySet){
+            e.setExamProblem(examProblemEntityResult);
+        }
+
+        examParticipantRepository.saveAll(examParticipantEntitySet);
 
         resultDTO.setData(examProblemEntityResult);
         resultDTO.setErrorCode("0");

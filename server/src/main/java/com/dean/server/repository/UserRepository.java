@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     @Query("select u.username from  user_account u where u.msv = ?1")
     public String getUsernameByMsv(String msv);
 
+    @Query("select u.username from  user_account u where u.role = ?1")
+    List<String> getAllUsernameByRole(short role);
 }

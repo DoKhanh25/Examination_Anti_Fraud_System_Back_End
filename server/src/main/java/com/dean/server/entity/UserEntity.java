@@ -1,9 +1,8 @@
 package com.dean.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "user_account")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity implements UserDetails {
@@ -37,6 +37,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "account_masv", unique = true)
     String msv;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     Set<ExamParticipantEntity> examParticipantEntitySet;
 
@@ -78,4 +79,5 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

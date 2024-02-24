@@ -1,23 +1,24 @@
 package com.dean.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Duration;
 import java.util.Date;
 import java.util.Set;
 
 @Entity(name = "exam_problem")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class ExamProblemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "examProblem")
     Set<ExamParticipantEntity> examParticipantEntitySet;
 

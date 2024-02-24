@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExamProblemDTO {
-     List<String> examParticipantSet;
+    List<String> examParticipantSet;
 
     String examTitle;
 

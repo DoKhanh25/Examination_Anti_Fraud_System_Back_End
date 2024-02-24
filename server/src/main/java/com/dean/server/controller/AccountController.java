@@ -31,6 +31,6 @@ public class AccountController {
 
     @GetMapping("/getAccounts")
     public ResponseEntity<?> getAllAccounts(){
-        return  accountService.getAllAccount();
+        return  accountService.getAllStudentAccount();
     }
 }
