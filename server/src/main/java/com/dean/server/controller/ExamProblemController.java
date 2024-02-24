@@ -23,4 +23,9 @@ public class ExamProblemController {
     public ResponseEntity<?> getAllExamProblem(){
         return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getAllExamProblem());
     }
+
+    @GetMapping(value = "/getExamProblem/{username}")
+    public ResponseEntity<?> getExamProblemByUsername(@PathVariable("username") String username){
+        return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getExamProblemByUsername(username));
+    }
 }
