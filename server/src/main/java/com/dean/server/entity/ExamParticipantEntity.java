@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Serializable;
+
 @Entity(name = "exam_participant")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExamParticipantEntity {
+public class ExamParticipantEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;

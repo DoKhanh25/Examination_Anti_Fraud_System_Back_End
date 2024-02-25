@@ -51,7 +51,7 @@ public class ExamProblemService {
         examProblemEntity.setCreateBy(examProblemDTO.getCreateBy());
         examProblemEntity.setStartTime(examProblemDTO.getStartTime());
         examProblemEntity.setEndTime(examProblemDTO.getEndTime());
-        examProblemEntity.setDuration(Duration.ofSeconds(examProblemDTO.getDuration()));
+        examProblemEntity.setDuration(examProblemDTO.getDuration());
 
 
         for(String student : examProblemDTO.getExamParticipantSet()){
@@ -104,8 +104,9 @@ public class ExamProblemService {
             examInformationDTO.setStartTime((Date) objectList.get(3));
             examInformationDTO.setEndTime((Date) objectList.get(4));
             examInformationDTO.setUsername((String) objectList.get(5));
-            examInformationDTO.setDuration(((Duration) objectList.get(6)).toMillis());
+            examInformationDTO.setDuration((Long) objectList.get(6));
             examInformationDTO.setExamSolution((String) objectList.get(7));
+            examInformationDTO.setExamId((Integer) objectList.get(8));
 
             examInformationDTOList.add(examInformationDTO);
         }
@@ -125,9 +126,10 @@ public class ExamProblemService {
             examStudentDTO.setMsv((String) objectList.get(2));
             examStudentDTO.setStartTime((Date) objectList.get(3));
             examStudentDTO.setEndTime((Date) objectList.get(4));
-            examStudentDTO.setDuration(((Duration) objectList.get(5)).toMillis());
+            examStudentDTO.setDuration((Long) objectList.get(5));
             examStudentDTO.setCreateBy((String) objectList.get(6));
             examStudentDTO.setExamTitle((String) objectList.get(7));
+            examStudentDTO.setSubmitDuration((Long) objectList.get(8));
 
             examStudentDTOList.add(examStudentDTO);
         }
@@ -139,21 +141,41 @@ public class ExamProblemService {
 
     public ResultDTO getExamDetailByParticipant(ExamParticipantDTO examParticipantDTO){
         ExamDetailDTO examDetailDTO = new ExamDetailDTO();
-        List<Object> listData = examProblemRepository.getExamDetailByExamParticipant(examParticipantDTO);
+        List<List<Object>> listData = examProblemRepository.getExamDetailByExamParticipant(examParticipantDTO);
         ResultDTO resultDTO = new ResultDTO();
 
-        examDetailDTO.setExamDuration(((Duration) listData.get(0)).toSeconds());
-        examDetailDTO.setExamDescription((String) listData.get(1));
-        examDetailDTO.setExamTitle((String) listData.get(2));
-        examDetailDTO.setSubmitDuration((Long) listData.get(3));
-        if(listData.get(4) == null){
-            examDetailDTO.setExamSolution(null);
-        } else {
-            examDetailDTO.setExamSolution((String) listData.get(4));
+        ExamParticipantEntity examParticipantEntity = examProblemRepository.getExamProblemEntityByUsernameAndExamId(examParticipantDTO);
+        Date startDate = examParticipantEntity.getExamProblem().getStartTime();
+        Date endDate = examParticipantEntity.getExamProblem().getEndTime();
+
+        Date toDay = new Date();
+        if(toDay.before(startDate)){
+            resultDTO.setErrorCode("-3");
+            resultDTO.setData("Not start");
+            resultDTO.setMessage("Not start");
+            return resultDTO;
+        }
+        if(toDay.after(endDate)){
+            resultDTO.setErrorCode("-2");
+            resultDTO.setData("Already occur");
+            resultDTO.setMessage("Already occur");
+            return resultDTO;
         }
 
+        examDetailDTO.setExamDuration((Long) listData.get(0).get(0));
+        examDetailDTO.setExamDescription((String) listData.get(0).get(1));
+        examDetailDTO.setExamTitle((String) listData.get(0).get(2));
+        examDetailDTO.setSubmitDuration((Long) listData.get(0).get(3));
+
+        if(listData.get(0).get(4) == null){
+            examDetailDTO.setExamSolution(null);
+        } else {
+            examDetailDTO.setExamSolution((String) listData.get(0).get(4));
+        }
+
+
         if(examDetailDTO.getExamSolution() != null && examDetailDTO.getSubmitDuration() == 0L){
-            resultDTO.setErrorCode("-1");
+            resultDTO.setErrorCode("-2");
             resultDTO.setData(null);
             resultDTO.setMessage("Already occur");
             return resultDTO;
@@ -162,6 +184,8 @@ public class ExamProblemService {
         resultDTO.setData(examDetailDTO);
         return  resultDTO;
     }
+
+
 
 
 }

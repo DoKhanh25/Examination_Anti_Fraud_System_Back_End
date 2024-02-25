@@ -1,9 +1,11 @@
 package com.dean.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Set;
@@ -13,12 +15,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ExamProblemEntity {
+public class ExamProblemEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "examProblem")
     Set<ExamParticipantEntity> examParticipantEntitySet;
 
@@ -35,7 +38,7 @@ public class ExamProblemEntity {
     Date endTime;
 
     @Column(name = "exam_duration")
-    Duration duration;
+    Long duration;
 
     @Column(name = "created_by")
     String createBy;

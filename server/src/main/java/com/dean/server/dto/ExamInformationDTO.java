@@ -19,6 +19,7 @@ public class ExamInformationDTO {
     String username;
     Long duration;
     String examSolution;
+    Integer examId;
 
 
 }

@@ -14,4 +14,5 @@ public class ExamStudentDTO {
     Long duration;
     String createBy;
     String examTitle;
+    Long submitDuration;
 }

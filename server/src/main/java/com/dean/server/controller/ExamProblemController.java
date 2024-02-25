@@ -2,8 +2,10 @@ package com.dean.server.controller;
 
 import com.dean.server.dto.ExamParticipantDTO;
 import com.dean.server.dto.ExamProblemDTO;
+import com.dean.server.dto.ExamSolutionDTO;
 import com.dean.server.dto.ResultDTO;
 import com.dean.server.service.ExamProblemService;
+import com.dean.server.service.ExamSolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ public class ExamProblemController {
 
     @Autowired
     private ExamProblemService examProblemService;
+
+    @Autowired
+    ExamSolutionService examSolutionService;
 
 
 
@@ -39,7 +44,14 @@ public class ExamProblemController {
     }
 
     @PostMapping(value = "/postExamSolution")
-    public ResponseEntity<ResultDTO> postExamSolution(@RequestBody ExamParticipantDTO examParticipantDTO){
-        return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getExamDetailByParticipant(examParticipantDTO));
+    public ResponseEntity<ResultDTO> postExamSolution(@RequestBody ExamSolutionDTO examSolutionDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.updateExamSolution(examSolutionDTO));
     }
+
+    @PostMapping(value = "/getExamSolution")
+    public ResponseEntity<ResultDTO> getExamSolutionByExamParticipant(@RequestBody ExamParticipantDTO examParticipantDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.getExamSolutionByParticipant(examParticipantDTO));
+    }
+
+
 }
