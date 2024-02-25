@@ -1,15 +1,14 @@
 package com.dean.server.service;
 
 
-import com.dean.server.dto.ExamInformationDTO;
-import com.dean.server.dto.ExamProblemDTO;
-import com.dean.server.dto.ExamStudentDTO;
-import com.dean.server.dto.ResultDTO;
+import com.dean.server.dto.*;
 import com.dean.server.entity.ExamParticipantEntity;
 import com.dean.server.entity.ExamProblemEntity;
+import com.dean.server.entity.ExamSolutionEntity;
 import com.dean.server.entity.UserEntity;
 import com.dean.server.repository.ExamParticipantRepository;
 import com.dean.server.repository.ExamProblemRepository;
+import com.dean.server.repository.ExamSolutionRepository;
 import com.dean.server.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +31,14 @@ public class ExamProblemService {
     @Autowired
     private ExamParticipantRepository examParticipantRepository;
 
+    @Autowired
+    private ExamSolutionRepository examSolutionRepository;
+
     public ResultDTO saveExamProblem(ExamProblemDTO examProblemDTO) {
         ResultDTO resultDTO = new ResultDTO();
         ExamProblemEntity examProblemEntity = new ExamProblemEntity();
         Set<ExamParticipantEntity> examParticipantEntitySet = new HashSet<>();
-
+        List<ExamSolutionEntity> examSolutionEntityList = new ArrayList<>();
 
         if(examProblemDTO.getExamParticipantSet() == null){
             resultDTO.setErrorCode("-1");
@@ -44,13 +46,12 @@ public class ExamProblemService {
             return resultDTO;
         }
 
-
         examProblemEntity.setExamTitle(examProblemDTO.getExamTitle());
         examProblemEntity.setExamDescription(examProblemDTO.getExamDescription());
         examProblemEntity.setCreateBy(examProblemDTO.getCreateBy());
         examProblemEntity.setStartTime(examProblemDTO.getStartTime());
         examProblemEntity.setEndTime(examProblemDTO.getEndTime());
-        examProblemEntity.setDuration(Duration.ofMillis(examProblemDTO.getDuration()));
+        examProblemEntity.setDuration(Duration.ofSeconds(examProblemDTO.getDuration()));
 
 
         for(String student : examProblemDTO.getExamParticipantSet()){
@@ -70,7 +71,15 @@ public class ExamProblemService {
             e.setExamProblem(examProblemEntityResult);
         }
 
-        examParticipantRepository.saveAll(examParticipantEntitySet);
+        List<ExamParticipantEntity> examParticipantEntityListRs = examParticipantRepository.saveAll(examParticipantEntitySet);
+        for(ExamParticipantEntity examParticipantEntity: examParticipantEntityListRs){
+            ExamSolutionEntity examSolution = new ExamSolutionEntity();
+            examSolution.setExamParticipantEntity(examParticipantEntity);
+            examSolution.setSubmitDuration(examProblemDTO.getDuration());
+            examSolutionEntityList.add(examSolution);
+        }
+        examSolutionRepository.saveAll(examSolutionEntityList);
+
 
         resultDTO.setData(examProblemEntityResult);
         resultDTO.setErrorCode("0");
@@ -111,13 +120,14 @@ public class ExamProblemService {
         List<ExamStudentDTO> examStudentDTOList = new ArrayList<>();
         for(List<Object> objectList : listData){
             ExamStudentDTO examStudentDTO = new ExamStudentDTO();
-            examStudentDTO.setUsername((String) objectList.get(0));
-            examStudentDTO.setMsv((String) objectList.get(1));
-            examStudentDTO.setStartTime((Date) objectList.get(2));
-            examStudentDTO.setEndTime((Date) objectList.get(3));
-            examStudentDTO.setDuration(((Duration) objectList.get(4)).toMillis());
-            examStudentDTO.setCreateBy((String) objectList.get(5));
-            examStudentDTO.setExamTitle((String) objectList.get(6));
+            examStudentDTO.setId((Integer) objectList.get(0));
+            examStudentDTO.setUsername((String) objectList.get(1));
+            examStudentDTO.setMsv((String) objectList.get(2));
+            examStudentDTO.setStartTime((Date) objectList.get(3));
+            examStudentDTO.setEndTime((Date) objectList.get(4));
+            examStudentDTO.setDuration(((Duration) objectList.get(5)).toMillis());
+            examStudentDTO.setCreateBy((String) objectList.get(6));
+            examStudentDTO.setExamTitle((String) objectList.get(7));
 
             examStudentDTOList.add(examStudentDTO);
         }
@@ -125,5 +135,9 @@ public class ExamProblemService {
         resultDTO.setData(examStudentDTOList);
 
         return resultDTO;
+    }
+
+    public ResultDTO getExamProblemDurationById(ExamParticipantDTO examParticipantDTO){
+        return null;
     }
 }

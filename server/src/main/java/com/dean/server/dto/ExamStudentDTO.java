@@ -6,6 +6,7 @@ import java.util.Date;
 
 @Data
 public class ExamStudentDTO {
+    Integer id;
     String username;
     String msv;
     Date startTime;
