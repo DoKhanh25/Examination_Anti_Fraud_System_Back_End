@@ -137,7 +137,31 @@ public class ExamProblemService {
         return resultDTO;
     }
 
-    public ResultDTO getExamProblemDurationById(ExamParticipantDTO examParticipantDTO){
-        return null;
+    public ResultDTO getExamDetailByParticipant(ExamParticipantDTO examParticipantDTO){
+        ExamDetailDTO examDetailDTO = new ExamDetailDTO();
+        List<Object> listData = examProblemRepository.getExamDetailByExamParticipant(examParticipantDTO);
+        ResultDTO resultDTO = new ResultDTO();
+
+        examDetailDTO.setExamDuration(((Duration) listData.get(0)).toSeconds());
+        examDetailDTO.setExamDescription((String) listData.get(1));
+        examDetailDTO.setExamTitle((String) listData.get(2));
+        examDetailDTO.setSubmitDuration((Long) listData.get(3));
+        if(listData.get(4) == null){
+            examDetailDTO.setExamSolution(null);
+        } else {
+            examDetailDTO.setExamSolution((String) listData.get(4));
+        }
+
+        if(examDetailDTO.getExamSolution() != null && examDetailDTO.getSubmitDuration() == 0L){
+            resultDTO.setErrorCode("-1");
+            resultDTO.setData(null);
+            resultDTO.setMessage("Already occur");
+            return resultDTO;
+        }
+        resultDTO.setErrorCode("0");
+        resultDTO.setData(examDetailDTO);
+        return  resultDTO;
     }
+
+
 }

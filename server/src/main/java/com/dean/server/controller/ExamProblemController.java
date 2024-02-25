@@ -16,6 +16,8 @@ public class ExamProblemController {
     @Autowired
     private ExamProblemService examProblemService;
 
+
+
     @PostMapping(value = "/saveExamProblem")
     public ResponseEntity<ResultDTO> saveExamProblem(@RequestBody ExamProblemDTO examProblemDTO){
         return  ResponseEntity.status(HttpStatus.OK).body(examProblemService.saveExamProblem(examProblemDTO));
@@ -33,7 +35,11 @@ public class ExamProblemController {
 
     @PostMapping(value = "/getExamDetail")
     public ResponseEntity<ResultDTO> getExamDetailByParticipant(@RequestBody ExamParticipantDTO examParticipantDTO){
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getExamDetailByParticipant(examParticipantDTO));
+    }
 
+    @PostMapping(value = "/postExamSolution")
+    public ResponseEntity<ResultDTO> postExamSolution(@RequestBody ExamParticipantDTO examParticipantDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getExamDetailByParticipant(examParticipantDTO));
     }
 }
