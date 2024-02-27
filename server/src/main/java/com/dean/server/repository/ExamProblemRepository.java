@@ -1,18 +1,12 @@
 package com.dean.server.repository;
 
-import com.dean.server.dto.ExamInformationDTO;
 import com.dean.server.dto.ExamParticipantDTO;
-import com.dean.server.dto.ExamProblemDTO;
-import com.dean.server.dto.ExamSolutionDTO;
-import com.dean.server.entity.ExamParticipantEntity;
 import com.dean.server.entity.ExamProblemEntity;
-import com.dean.server.entity.ExamSolutionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
 import java.util.List;
 
 @Repository
@@ -27,7 +21,7 @@ public interface ExamProblemRepository extends JpaRepository<ExamProblemEntity, 
      List<List<Object>> getAllExamProblemWithStudent();
 
     @Query("select ep.id, ua.username, ua.msv, ep.startTime, " +
-            "ep.endTime, ep.duration, ep.createBy, ep.examTitle, es.submitDuration " +
+            "ep.endTime, ep.duration, ep.createBy, ep.examTitle, es.examDone " +
             "from user_account ua " +
             "join exam_participant ept on ua.id = ept.student.id " +
             "join exam_problem ep on ept.examProblem.id = ep.id " +
@@ -35,15 +29,15 @@ public interface ExamProblemRepository extends JpaRepository<ExamProblemEntity, 
             "where ua.username = ?1")
     List<List<Object>> getExamProblemByUsername(String username);
 
-    @Query("select ep.duration, ep.examDescription, ep.examTitle, es.submitDuration, es.examSolution " +
+    @Query("select ep.duration, ep.examDescription, ep.examTitle, es.submitDuration, es.examSolution, es.examDone " +
             "from exam_problem ep " +
             "join exam_participant ept on ep.id = ept.examProblem.id " +
             "join exam_solution es on es.examParticipantEntity.id = ept.id " +
             "where ept.examProblem.id = :#{#dto.examId} and ept.student.username = :#{#dto.username}")
     List<List<Object>> getExamDetailByExamParticipant(@Param("dto") ExamParticipantDTO examParticipantDTO);
 
-    @Query("select ept from exam_participant ept where ept.student.username = :#{#dto.username} and ept.examProblem.id = :#{#dto.examId}")
-    ExamParticipantEntity getExamProblemEntityByUsernameAndExamId(@Param("dto") ExamParticipantDTO examParticipantDTO);
+    @Query("select ep.duration from exam_problem ep where ep.id = ?1")
+    Long getExamProblemDurationById(Integer id);
 
 
 

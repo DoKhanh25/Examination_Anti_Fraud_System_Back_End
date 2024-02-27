@@ -1,7 +1,8 @@
 package com.dean.server.service;
 
 import com.dean.server.dto.ExamParticipantDTO;
-import com.dean.server.dto.ExamSolutionDTO;
+import com.dean.server.dto.ExamSolutionRequestDTO;
+import com.dean.server.dto.ExamSolutionReponseDTO;
 import com.dean.server.dto.ResultDTO;
 import com.dean.server.entity.ExamParticipantEntity;
 import com.dean.server.entity.ExamSolutionEntity;
@@ -27,26 +28,30 @@ public class ExamSolutionService {
 
 
 
-    public ResultDTO updateExamSolution(ExamSolutionDTO examSolutionDTO){
+    public ResultDTO updateExamSolution(ExamSolutionRequestDTO examSolutionRequestDTO){
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setErrorCode("0");
 
-        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantByExamIdAndUsername(examSolutionDTO.getExamId(), examSolutionDTO.getUsername());
+        ExamParticipantDTO examParticipantDTO = new ExamParticipantDTO();
+        examParticipantDTO.setUsername(examSolutionRequestDTO.getUsername());
+        examParticipantDTO.setExamId(examSolutionRequestDTO.getExamId());
+
+        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
         ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByExamParticipantEntity(examParticipant);
 
-        if(examSolutionDTO.getHiddenValue() == null || examSolutionDTO.getHiddenValue() == ""){
-            examSolution.setExamValid((short) 0);
-            examSolution.setSolutionOriginal(null);
-            examSolution.setSubmitTime(examSolutionDTO.getSubmitTime());
-            examSolution.setSubmitDuration(examSolutionDTO.getSubmitDuration());
-            examSolution.setExamSolution(examSolutionDTO.getExamSolution());
+        if(examSolutionRequestDTO.getHiddenValue() == null || examSolutionRequestDTO.getHiddenValue().equals("")){
+            examSolution.setSubmitTime(examSolutionRequestDTO.getSubmitTime());
+            examSolution.setExamSolution(examSolutionRequestDTO.getExamSolution());
+            examSolution.setExamDone(examSolutionRequestDTO.getExamDone());
         } else {
-            examSolution.setExamValid((short) 1);
-            examSolution.setSolutionOriginal(examSolutionDTO.getHiddenValue());
-            examSolution.setSubmitTime(examSolutionDTO.getSubmitTime());
-            examSolution.setSubmitDuration(examSolutionDTO.getSubmitDuration());
-            examSolution.setExamSolution(examSolutionDTO.getExamSolution());
+            examSolution.setExamValid((short) 0);
+            examSolution.setSolutionOriginal(examSolutionRequestDTO.getHiddenValue());
+            examSolution.setSubmitTime(examSolutionRequestDTO.getSubmitTime());
+            examSolution.setExamSolution(examSolutionRequestDTO.getExamSolution());
+            examSolution.setExamDone(examSolutionRequestDTO.getExamDone());
         }
+        examSolution.setExamParticipantEntity(examParticipant);
+
         resultDTO.setData(examSolutionRepository.save(examSolution));
 
         return resultDTO;
@@ -55,18 +60,37 @@ public class ExamSolutionService {
     public ResultDTO getExamSolutionByParticipant(ExamParticipantDTO examParticipantDTO){
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setErrorCode("0");
-        ExamSolutionDTO examSolutionDTO = new ExamSolutionDTO();
+        ExamSolutionReponseDTO examSolutionReponseDTO = new ExamSolutionReponseDTO();
 
+        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
+        ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByExamParticipantEntity(examParticipant);
 
-        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantByExamIdAndUsername(examParticipantDTO.getExamId(), examParticipantDTO.getUsername());
-        ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByParticipantId(examParticipant.getId());
+        examSolutionReponseDTO.setSubmitDuration(examSolution.getSubmitDuration());
+        examSolutionReponseDTO.setExamSolution(examSolution.getExamSolution());
+        examSolutionReponseDTO.setSubmitTime(examSolution.getSubmitTime());
+        examSolutionReponseDTO.setExamValid(examSolution.getExamValid());
+        examSolutionReponseDTO.setSolutionOriginal(examSolutionReponseDTO.getSolutionOriginal());
 
-        examSolutionDTO.setExamSolution(examSolution.getExamSolution());
-        examSolutionDTO.setSubmitTime(examSolution.getSubmitTime());
-        examSolutionDTO.setHiddenValue(examSolutionDTO.getHiddenValue());
-
-        resultDTO.setData(examSolutionDTO);
+        resultDTO.setData(examSolutionReponseDTO);
         return resultDTO;
 
+    }
+
+    public ResultDTO postExamFinishTime(ExamParticipantDTO examParticipantDTO){
+        ResultDTO resultDTO = new ResultDTO();
+        Date dateExpired = examSolutionRepository.getExamFininshByParticipantDTO(examParticipantDTO);
+        if(dateExpired != null){
+            resultDTO.setErrorCode("-1");
+            return resultDTO;
+        }
+
+        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
+        Long duration = examProblemRepository.getExamProblemDurationById(examParticipantDTO.getExamId());
+        Date expiredExam = new Date((new Date()).getTime() + duration*1000);
+
+        Integer result = examSolutionRepository.insertExamFinishByParticipantId(examParticipant.getId(), expiredExam);
+        resultDTO.setErrorCode("0");
+        resultDTO.setData(expiredExam);
+        return resultDTO;
     }
 }

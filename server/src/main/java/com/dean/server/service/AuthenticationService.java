@@ -4,10 +4,6 @@ import com.dean.server.dto.*;
 import com.dean.server.entity.UserEntity;
 import com.dean.server.repository.UserRepository;
 import com.dean.server.security.JwtUtil;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Iterator;
 
 @Service
 public class AuthenticationService {
@@ -95,15 +88,15 @@ public class AuthenticationService {
 
     }
 
-    public ResponseEntity<?> login(LoginDTO loginDTO){
+    public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO){
         ResultDTO resultDTO = new ResultDTO();
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
 
 
         Authentication authentication= authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDTO.getUsername(),
-                        loginDTO.getPassword()
+                        loginRequestDTO.getUsername(),
+                        loginRequestDTO.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);

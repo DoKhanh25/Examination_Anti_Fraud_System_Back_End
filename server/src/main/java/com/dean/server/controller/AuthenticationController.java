@@ -1,7 +1,7 @@
 package com.dean.server.controller;
 
 import com.dean.server.dto.ExamPostDTO;
-import com.dean.server.dto.LoginDTO;
+import com.dean.server.dto.LoginRequestDTO;
 import com.dean.server.dto.RegisterDTO;
 import com.dean.server.service.AuthenticationService;
 import com.dean.server.service.ExamService;
@@ -30,8 +30,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO){
-        return authenticationService.login(loginDTO);
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO){
+        return authenticationService.login(loginRequestDTO);
     }
     // need fix
     @PostMapping("/postExam")

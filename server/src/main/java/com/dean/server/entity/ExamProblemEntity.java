@@ -21,7 +21,6 @@ public class ExamProblemEntity implements Serializable {
     Integer id;
 
     @JsonIgnore
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "examProblem")
     Set<ExamParticipantEntity> examParticipantEntitySet;
 

@@ -76,6 +76,9 @@ public class ExamProblemService {
             ExamSolutionEntity examSolution = new ExamSolutionEntity();
             examSolution.setExamParticipantEntity(examParticipantEntity);
             examSolution.setSubmitDuration(examProblemDTO.getDuration());
+            examSolution.setExamValid((short) 1);
+            examSolution.setExamDone(false);
+
             examSolutionEntityList.add(examSolution);
         }
         examSolutionRepository.saveAll(examSolutionEntityList);
@@ -86,8 +89,6 @@ public class ExamProblemService {
         resultDTO.setMessage("Thành công");
 
         return resultDTO;
-
-
     }
 
     public ResultDTO getAllExamProblem(){
@@ -129,7 +130,7 @@ public class ExamProblemService {
             examStudentDTO.setDuration((Long) objectList.get(5));
             examStudentDTO.setCreateBy((String) objectList.get(6));
             examStudentDTO.setExamTitle((String) objectList.get(7));
-            examStudentDTO.setSubmitDuration((Long) objectList.get(8));
+            examStudentDTO.setExamDone((Boolean) objectList.get(8));
 
             examStudentDTOList.add(examStudentDTO);
         }
@@ -141,16 +142,18 @@ public class ExamProblemService {
 
     public ResultDTO getExamDetailByParticipant(ExamParticipantDTO examParticipantDTO){
         ExamDetailDTO examDetailDTO = new ExamDetailDTO();
-        List<List<Object>> listData = examProblemRepository.getExamDetailByExamParticipant(examParticipantDTO);
         ResultDTO resultDTO = new ResultDTO();
+        resultDTO.setErrorCode("0");
 
-        ExamParticipantEntity examParticipantEntity = examProblemRepository.getExamProblemEntityByUsernameAndExamId(examParticipantDTO);
+        List<List<Object>> listData = examProblemRepository.getExamDetailByExamParticipant(examParticipantDTO);
+        ExamParticipantEntity examParticipantEntity = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
+
         Date startDate = examParticipantEntity.getExamProblem().getStartTime();
         Date endDate = examParticipantEntity.getExamProblem().getEndTime();
 
         Date toDay = new Date();
         if(toDay.before(startDate)){
-            resultDTO.setErrorCode("-3");
+            resultDTO.setErrorCode("-1");
             resultDTO.setData("Not start");
             resultDTO.setMessage("Not start");
             return resultDTO;
@@ -166,21 +169,20 @@ public class ExamProblemService {
         examDetailDTO.setExamDescription((String) listData.get(0).get(1));
         examDetailDTO.setExamTitle((String) listData.get(0).get(2));
         examDetailDTO.setSubmitDuration((Long) listData.get(0).get(3));
-
-        if(listData.get(0).get(4) == null){
-            examDetailDTO.setExamSolution(null);
-        } else {
+        if(listData.get(0).get(4) != null){
             examDetailDTO.setExamSolution((String) listData.get(0).get(4));
+        } else {
+            examDetailDTO.setExamSolution(null);
         }
+        examDetailDTO.setExamDone((Boolean) listData.get(0).get(5));
 
-
-        if(examDetailDTO.getExamSolution() != null && examDetailDTO.getSubmitDuration() == 0L){
-            resultDTO.setErrorCode("-2");
+        if(examDetailDTO.getExamDone()){
+            resultDTO.setErrorCode("-3");
             resultDTO.setData(null);
-            resultDTO.setMessage("Already occur");
+            resultDTO.setMessage("Already do the exam");
             return resultDTO;
         }
-        resultDTO.setErrorCode("0");
+
         resultDTO.setData(examDetailDTO);
         return  resultDTO;
     }

@@ -1,5 +1,6 @@
 package com.dean.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,11 +32,18 @@ public class ExamSolutionEntity implements Serializable {
     @Column(name = "submit_time")
     Date submitTime;
 
-    @Column(name = "submitDuration")
+    @Column(name = "submit_duration")
     Long submitDuration;
+
+    @Column(name = "exam_done")
+    Boolean examDone;
+
+    @Column(name = "exam_finish")
+    Date examFinish;
 
     @OneToOne
     @MapsId
+    @JsonIgnore
     @JoinColumn(name = "exam_participant_id")
-    private ExamParticipantEntity examParticipantEntity;
+    ExamParticipantEntity examParticipantEntity;
 }

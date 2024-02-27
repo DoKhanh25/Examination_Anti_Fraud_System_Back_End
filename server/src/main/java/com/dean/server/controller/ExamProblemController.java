@@ -2,7 +2,7 @@ package com.dean.server.controller;
 
 import com.dean.server.dto.ExamParticipantDTO;
 import com.dean.server.dto.ExamProblemDTO;
-import com.dean.server.dto.ExamSolutionDTO;
+import com.dean.server.dto.ExamSolutionRequestDTO;
 import com.dean.server.dto.ResultDTO;
 import com.dean.server.service.ExamProblemService;
 import com.dean.server.service.ExamSolutionService;
@@ -44,13 +44,18 @@ public class ExamProblemController {
     }
 
     @PostMapping(value = "/postExamSolution")
-    public ResponseEntity<ResultDTO> postExamSolution(@RequestBody ExamSolutionDTO examSolutionDTO){
-        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.updateExamSolution(examSolutionDTO));
+    public ResponseEntity<ResultDTO> postExamSolution(@RequestBody ExamSolutionRequestDTO examSolutionRequestDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.updateExamSolution(examSolutionRequestDTO));
     }
 
     @PostMapping(value = "/getExamSolution")
     public ResponseEntity<ResultDTO> getExamSolutionByExamParticipant(@RequestBody ExamParticipantDTO examParticipantDTO){
         return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.getExamSolutionByParticipant(examParticipantDTO));
+    }
+
+    @PostMapping(value = "/postExamFinishTime")
+    public ResponseEntity<ResultDTO> postExamFinishTime(@RequestBody ExamParticipantDTO examParticipantDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.postExamFinishTime(examParticipantDTO));
     }
 
 

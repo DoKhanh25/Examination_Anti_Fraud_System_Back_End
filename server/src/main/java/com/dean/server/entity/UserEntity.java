@@ -40,7 +40,6 @@ public class UserEntity implements UserDetails, Serializable {
     String msv;
 
     @JsonIgnore
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "student")
     Set<ExamParticipantEntity> examParticipantEntitySet;
 
