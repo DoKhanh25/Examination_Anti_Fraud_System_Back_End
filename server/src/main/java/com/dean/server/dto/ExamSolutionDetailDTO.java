@@ -1,21 +1,24 @@
 package com.dean.server.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Date;
+import java.util.Set;
+
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ExamSolutionReponseDTO {
+@NoArgsConstructor
+public class ExamSolutionDetailDTO {
     String examSolution;
     short examValid;
-    String solutionOriginal;
+    Set<String> examFraud;
     Float grade;
     Date submitTime;
     Long submitDuration;
-    short examDone;
+    Boolean examDone;
+    String examTitle;
+    String examDescription;
+    Long duration;
 }

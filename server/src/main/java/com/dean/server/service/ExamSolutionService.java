@@ -1,18 +1,18 @@
 package com.dean.server.service;
 
-import com.dean.server.dto.ExamParticipantDTO;
-import com.dean.server.dto.ExamSolutionRequestDTO;
-import com.dean.server.dto.ExamSolutionReponseDTO;
-import com.dean.server.dto.ResultDTO;
-import com.dean.server.entity.ExamParticipantEntity;
-import com.dean.server.entity.ExamSolutionEntity;
+import com.dean.server.dto.*;
+import com.dean.server.entity.*;
 import com.dean.server.repository.ExamParticipantRepository;
 import com.dean.server.repository.ExamProblemRepository;
 import com.dean.server.repository.ExamSolutionRepository;
+import com.dean.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 
@@ -25,6 +25,9 @@ public class ExamSolutionService {
 
     @Autowired
     ExamParticipantRepository examParticipantRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
 
 
@@ -39,13 +42,28 @@ public class ExamSolutionService {
         ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
         ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByExamParticipantEntity(examParticipant);
 
-        if(examSolutionRequestDTO.getHiddenValue() == null || examSolutionRequestDTO.getHiddenValue().equals("")){
+        if(examSolution.getExamDone()){
+            resultDTO.setErrorCode("-1");
+            resultDTO.setMessage("Already finish");
+            resultDTO.setData(null);
+            return resultDTO;
+        }
+
+        if(examSolutionRequestDTO.getHiddenValue() == null || examSolutionRequestDTO.getHiddenValue().equals("")) {
             examSolution.setSubmitTime(examSolutionRequestDTO.getSubmitTime());
             examSolution.setExamSolution(examSolutionRequestDTO.getExamSolution());
             examSolution.setExamDone(examSolutionRequestDTO.getExamDone());
         } else {
+
+            UserEntity user = userRepository.findByUsername(examSolutionRequestDTO.getHiddenValue());
+            Set<UserEntity> userEntityFraudSet = examSolution.getExamFraudEntitySet();
+            if(user != null) {
+                userEntityFraudSet.add(user);
+            }
+
             examSolution.setExamValid((short) 0);
-            examSolution.setSolutionOriginal(examSolutionRequestDTO.getHiddenValue());
+
+            examSolution.setExamFraudEntitySet(userEntityFraudSet);
             examSolution.setSubmitTime(examSolutionRequestDTO.getSubmitTime());
             examSolution.setExamSolution(examSolutionRequestDTO.getExamSolution());
             examSolution.setExamDone(examSolutionRequestDTO.getExamDone());
@@ -58,20 +76,44 @@ public class ExamSolutionService {
     }
 
     public ResultDTO getExamSolutionByParticipant(ExamParticipantDTO examParticipantDTO){
+
         ResultDTO resultDTO = new ResultDTO();
         resultDTO.setErrorCode("0");
-        ExamSolutionReponseDTO examSolutionReponseDTO = new ExamSolutionReponseDTO();
+        ExamSolutionDetailDTO examSolutionDetailDTO = new ExamSolutionDetailDTO();
+        Set<String> usernameFraud = new HashSet<>();
 
         ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
         ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByExamParticipantEntity(examParticipant);
+        ExamProblemEntity examProblem = examProblemRepository.getExamProblemEntityById(examParticipantDTO.getExamId());
 
-        examSolutionReponseDTO.setSubmitDuration(examSolution.getSubmitDuration());
-        examSolutionReponseDTO.setExamSolution(examSolution.getExamSolution());
-        examSolutionReponseDTO.setSubmitTime(examSolution.getSubmitTime());
-        examSolutionReponseDTO.setExamValid(examSolution.getExamValid());
-        examSolutionReponseDTO.setSolutionOriginal(examSolutionReponseDTO.getSolutionOriginal());
+        for (UserEntity user: examSolution.getExamFraudEntitySet()){
+            usernameFraud.add(user.getUsername());
+        }
 
-        resultDTO.setData(examSolutionReponseDTO);
+        examSolutionDetailDTO.setExamTitle(examProblem.getExamTitle());
+        examSolutionDetailDTO.setExamDescription(examProblem.getExamDescription());
+        examSolutionDetailDTO.setDuration(examProblem.getDuration());
+        examSolutionDetailDTO.setExamDone(examSolution.getExamDone());
+        examSolutionDetailDTO.setSubmitDuration(examSolution.getSubmitDuration());
+        examSolutionDetailDTO.setSubmitTime(examSolution.getSubmitTime());
+
+        examSolutionDetailDTO.setExamFraud(usernameFraud);
+
+        examSolutionDetailDTO.setGrade(examSolution.getGrade());
+        examSolutionDetailDTO.setExamValid(examSolution.getExamValid());
+        examSolutionDetailDTO.setExamSolution(examSolution.getExamSolution());
+
+//        ExamSolutionReponseDTO examSolutionReponseDTO = new ExamSolutionReponseDTO();
+
+//        examSolutionReponseDTO.setSubmitDuration(examSolution.getSubmitDuration());
+//        examSolutionReponseDTO.setExamSolution(examSolution.getExamSolution());
+//        examSolutionReponseDTO.setSubmitTime(examSolution.getSubmitTime());
+//        examSolutionReponseDTO.setExamValid(examSolution.getExamValid());
+//        examSolutionReponseDTO.setSolutionOriginal(examSolutionReponseDTO.getSolutionOriginal());
+
+//        resultDTO.setData(examSolutionReponseDTO);
+
+        resultDTO.setData(examSolutionDetailDTO);
         return resultDTO;
 
     }
@@ -93,4 +135,6 @@ public class ExamSolutionService {
         resultDTO.setData(expiredExam);
         return resultDTO;
     }
+
+
 }

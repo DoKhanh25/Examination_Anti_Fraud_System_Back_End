@@ -1,6 +1,7 @@
 package com.dean.server.repository;
 
 import com.dean.server.dto.ExamParticipantDTO;
+import com.dean.server.entity.ExamEntity;
 import com.dean.server.entity.ExamProblemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,6 +39,8 @@ public interface ExamProblemRepository extends JpaRepository<ExamProblemEntity, 
 
     @Query("select ep.duration from exam_problem ep where ep.id = ?1")
     Long getExamProblemDurationById(Integer id);
+
+    ExamProblemEntity getExamProblemEntityById(Integer id);
 
 
 

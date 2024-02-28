@@ -3,9 +3,9 @@ package com.dean.server.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Entity(name = "exam_solution")
 @Getter
@@ -17,14 +17,16 @@ public class ExamSolutionEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @Column(name = "exam_solution")
+    @Column(name = "exam_solution", columnDefinition = "longtext")
     String examSolution;
 
     @Column(name = "exam_valid")
     short examValid;
 
-    @Column(name = "solution_original_author")
-    String solutionOriginal;
+    @JsonIgnore
+    @OneToMany
+    @Column(name = "exam_fraud")
+    Set<UserEntity> examFraudEntitySet;
 
     @Column(name = "exam_grade")
     Float grade;

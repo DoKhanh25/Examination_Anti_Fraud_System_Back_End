@@ -44,6 +44,8 @@ public class UserEntity implements UserDetails, Serializable {
     Set<ExamParticipantEntity> examParticipantEntitySet;
 
 
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorityList = new ArrayList<>();
