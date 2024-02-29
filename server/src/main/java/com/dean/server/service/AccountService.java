@@ -40,9 +40,10 @@ public class AccountService {
 
 
 
-    public static final int COLUMN_INDEX_USERNAME = 1;
-    public static final int COLUMN_INDEX_PASSWORD = 2;
-    public static final int COLUMN_INDEX_NAME = 3;
+    public static final int COLUMN_INDEX_USERNAME = 0;
+    public static final int COLUMN_INDEX_PASSWORD = 1;
+    public static final int COLUMN_INDEX_NAME = 2;
+    public static final int COLUMN_INDEX_ROLE = 3;
 
     public ResponseEntity<?> saveAccountsByExcel(MultipartFile file){
 
@@ -57,6 +58,8 @@ public class AccountService {
             xlsxbook = new XSSFWorkbook(pkg);
 
             XSSFSheet sheet = xlsxbook.getSheetAt(0);
+
+
 
             Iterator<Row> itr = sheet.iterator();
 
@@ -74,7 +77,6 @@ public class AccountService {
                     Cell cell = cellIterator.next();
                     Object cellValue = getCellValue(cell);
 
-
                     int columnIndex = cell.getColumnIndex();
                     switch (columnIndex){
                         case COLUMN_INDEX_USERNAME:
@@ -86,6 +88,8 @@ public class AccountService {
                         case COLUMN_INDEX_NAME:
                             registerDTO.setName((String) cellValue);
                             break;
+                        case COLUMN_INDEX_ROLE:
+                            registerDTO.setRole(Short.parseShort(cellValue.toString()));
                         default:
                             break;
                     }
@@ -95,7 +99,9 @@ public class AccountService {
                 userEntity.setName(registerDTO.getName());
                 userEntity.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
                 userEntity.setUsername(registerDTO.getUsername());
-                userEntity.setRole((short) 1);
+                userEntity.setRole(registerDTO.getRole());
+
+                logger.info("registerDTO: " + registerDTO.toString());
 
                 userRepository.save(userEntity);
 
