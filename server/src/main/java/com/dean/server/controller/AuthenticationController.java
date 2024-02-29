@@ -20,22 +20,18 @@ public class AuthenticationController {
     Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
-    private ExamService examService;
-
-    @Autowired
     private AuthenticationService authenticationService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO){
+        logger.info("Registering user: " + registerDTO.getUsername());
         return authenticationService.register(registerDTO);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO){
+        logger.info("Logging in user: " + loginRequestDTO.getUsername());
         return authenticationService.login(loginRequestDTO);
     }
 

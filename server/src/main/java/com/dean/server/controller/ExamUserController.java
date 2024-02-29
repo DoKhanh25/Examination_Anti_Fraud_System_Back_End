@@ -1,9 +1,7 @@
 package com.dean.server.controller;
 
 import com.dean.server.dto.ExamParticipantDTO;
-import com.dean.server.dto.ExamProblemDTO;
 import com.dean.server.dto.ExamSolutionRequestDTO;
-import com.dean.server.dto.ResultDTO;
 import com.dean.server.security.JwtUtil;
 import com.dean.server.service.ExamProblemService;
 import com.dean.server.service.ExamSolutionService;
@@ -13,12 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/admin")
+@RequestMapping("/api/user")
 @RestController
-public class ExamProblemController {
-
+public class ExamUserController {
     @Autowired
     private ExamProblemService examProblemService;
 
@@ -28,35 +26,13 @@ public class ExamProblemController {
     @Autowired
     JwtUtil jwtUtil;
 
-    Logger logger = LoggerFactory.getLogger(ExamProblemController.class);
-
-    @PostMapping(value = "/saveExamProblem")
-    public ResponseEntity<?> saveExamProblem(
-            @RequestBody ExamProblemDTO examProblemDTO,
-            HttpServletRequest request){
-
-        Boolean isAdminRole = jwtUtil.isAdminRole(request);
-        if (!isAdminRole){
-            return ResponseEntity.status(403).body("You are not authorized to access this resource");
-        }
-
-        return  ResponseEntity.status(HttpStatus.OK).body(examProblemService.saveExamProblem(examProblemDTO));
-    }
-
-    @GetMapping(value = "/getAllExamProblem")
-    public ResponseEntity<?> getAllExamProblem(HttpServletRequest request){
-        Boolean isAdminRole = jwtUtil.isAdminRole(request);
-        if (!isAdminRole){
-            return ResponseEntity.status(403).body("You are not authorized to access this resource");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(examProblemService.getAllExamProblem());
-    }
+    Logger logger = LoggerFactory.getLogger(ExamUserController.class);
 
     @GetMapping(value = "/getExamProblem/{username}")
     public ResponseEntity<?> getExamProblemByUsername(
             @PathVariable("username") String username,
             HttpServletRequest request){
+
         String token = jwtUtil.getToken(request);
         String usernameFromToken = jwtUtil.extractUsername(token);
 
@@ -74,6 +50,7 @@ public class ExamProblemController {
 
         String token = jwtUtil.getToken(request);
         String usernameFromToken = jwtUtil.extractUsername(token);
+
         if(!examParticipantDTO.getUsername().equals(usernameFromToken)){
             return ResponseEntity.status(403).body("You are not authorized to access this resource");
         }
@@ -85,6 +62,7 @@ public class ExamProblemController {
     public ResponseEntity<?> postExamSolution(
             @RequestBody ExamSolutionRequestDTO examSolutionRequestDTO,
             HttpServletRequest request){
+
         String token = jwtUtil.getToken(request);
         String usernameFromToken = jwtUtil.extractUsername(token);
 
@@ -95,19 +73,6 @@ public class ExamProblemController {
         return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.updateExamSolution(examSolutionRequestDTO));
     }
 
-    @PostMapping(value = "/getExamSolution")
-    public ResponseEntity<?> getExamSolutionByExamParticipant(
-            @RequestBody ExamParticipantDTO examParticipantDTO,
-            HttpServletRequest request){
-
-        Boolean isAdminRole = jwtUtil.isAdminRole(request);
-        if (!isAdminRole){
-            return ResponseEntity.status(403).body("You are not authorized to access this resource");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.getExamSolutionByParticipant(examParticipantDTO));
-    }
-
     @PostMapping(value = "/postExamFinishTime")
     public ResponseEntity<?> postExamFinishTime(
             @RequestBody ExamParticipantDTO examParticipantDTO,
@@ -115,12 +80,11 @@ public class ExamProblemController {
 
         String token = jwtUtil.getToken(request);
         String usernameFromToken = jwtUtil.extractUsername(token);
+
         if(!examParticipantDTO.getUsername().equals(usernameFromToken)){
             return ResponseEntity.status(403).body("You are not authorized to access this resource");
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(examSolutionService.postExamFinishTime(examParticipantDTO));
     }
-
-
 }
