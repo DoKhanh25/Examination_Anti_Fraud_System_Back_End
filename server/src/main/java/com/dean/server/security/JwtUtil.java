@@ -30,6 +30,9 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
+    private static final String ADMIN_ROLE = "2";
+    private static final String USER_ROLE = "1";
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -82,7 +85,29 @@ public class JwtUtil {
     public String getToken (HttpServletRequest httpServletRequest) {
         final String bearerToken = httpServletRequest.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
-        {return bearerToken.substring(7,bearerToken.length()); } // The part after "Bearer "
+        {
+            return bearerToken.substring(7,bearerToken.length());
+        } // The part after "Bearer "
         return null;
+    }
+
+    public boolean isAdminRole(HttpServletRequest request){
+        String token = getToken(request);
+        if(token!=null){
+            Claims claims = extractAllClaims(token);
+            List<String> roles = (List<String>) claims.get("role");
+            return roles.contains(ADMIN_ROLE);
+        }
+        return false;
+    }
+
+    public boolean isUserRole(HttpServletRequest request){
+        String token = getToken(request);
+        if(token!=null){
+            Claims claims = extractAllClaims(token);
+            List<String> roles = (List<String>) claims.get("role");
+            return roles.contains(USER_ROLE);
+        }
+        return false;
     }
 }
