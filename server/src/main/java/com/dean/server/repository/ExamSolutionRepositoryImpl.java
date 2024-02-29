@@ -19,4 +19,12 @@ public class ExamSolutionRepositoryImpl implements ExamSolutionRepositoryCustom 
                 .setParameter("id", id)
                 .executeUpdate();
     }
+
+    public Integer insertGradeByParticipantId(Integer id, Float grade){
+        String sqlQuery = "UPDATE exam_solution set exam_grade = :grade where exam_participant_id = :id";
+        return  em.createNativeQuery(sqlQuery)
+                .setParameter("grade", grade)
+                .setParameter("id", id)
+                .executeUpdate();
+    }
 }

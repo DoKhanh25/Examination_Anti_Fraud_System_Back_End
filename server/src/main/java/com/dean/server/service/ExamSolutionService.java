@@ -136,5 +136,26 @@ public class ExamSolutionService {
         return resultDTO;
     }
 
+    public ResultDTO postGrade(GradeDTO gradeDTO){
+        ResultDTO resultDTO = new ResultDTO();
+        ExamParticipantDTO examParticipantDTO = new ExamParticipantDTO();
+        examParticipantDTO.setExamId(gradeDTO.getExamId());
+        examParticipantDTO.setUsername(gradeDTO.getUsername());
+
+        ExamParticipantEntity examParticipant = examParticipantRepository.getExamParticipantEntityByExamParticipantDTO(examParticipantDTO);
+        ExamSolutionEntity examSolution = examSolutionRepository.getExamSolutionEntityByExamParticipantEntity(examParticipant);
+        if(examSolution.getGrade() != null){
+            resultDTO.setErrorCode("-1");
+            resultDTO.setMessage("Already graded");
+            resultDTO.setData(null);
+            return resultDTO;
+        }
+        Integer result = examSolutionRepository.insertGradeByParticipantId(examParticipant.getId(), gradeDTO.getGrade());
+        resultDTO.setErrorCode("0");
+        resultDTO.setData(result);
+
+        return resultDTO;
+    }
+
 
 }
