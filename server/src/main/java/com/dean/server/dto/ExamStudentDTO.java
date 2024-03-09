@@ -20,4 +20,5 @@ public class ExamStudentDTO {
     String examTitle;
     Long submitDuration;
     Boolean examDone;
+    Float grade;
 }

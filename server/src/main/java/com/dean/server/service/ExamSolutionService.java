@@ -103,16 +103,6 @@ public class ExamSolutionService {
         examSolutionDetailDTO.setExamValid(examSolution.getExamValid());
         examSolutionDetailDTO.setExamSolution(examSolution.getExamSolution());
 
-//        ExamSolutionReponseDTO examSolutionReponseDTO = new ExamSolutionReponseDTO();
-
-//        examSolutionReponseDTO.setSubmitDuration(examSolution.getSubmitDuration());
-//        examSolutionReponseDTO.setExamSolution(examSolution.getExamSolution());
-//        examSolutionReponseDTO.setSubmitTime(examSolution.getSubmitTime());
-//        examSolutionReponseDTO.setExamValid(examSolution.getExamValid());
-//        examSolutionReponseDTO.setSolutionOriginal(examSolutionReponseDTO.getSolutionOriginal());
-
-//        resultDTO.setData(examSolutionReponseDTO);
-
         resultDTO.setData(examSolutionDetailDTO);
         return resultDTO;
 

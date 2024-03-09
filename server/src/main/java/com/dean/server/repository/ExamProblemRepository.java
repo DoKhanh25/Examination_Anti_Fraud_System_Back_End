@@ -22,7 +22,7 @@ public interface ExamProblemRepository extends JpaRepository<ExamProblemEntity, 
      List<List<Object>> getAllExamProblemWithStudent();
 
     @Query("select ep.id, ua.username, ua.msv, ep.startTime, " +
-            "ep.endTime, ep.duration, ep.createBy, ep.examTitle, es.examDone " +
+            "ep.endTime, ep.duration, ep.createBy, ep.examTitle, es.examDone, es.grade " +
             "from user_account ua " +
             "join exam_participant ept on ua.id = ept.student.id " +
             "join exam_problem ep on ept.examProblem.id = ep.id " +

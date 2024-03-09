@@ -131,6 +131,11 @@ public class ExamProblemService {
             examStudentDTO.setCreateBy((String) objectList.get(6));
             examStudentDTO.setExamTitle((String) objectList.get(7));
             examStudentDTO.setExamDone((Boolean) objectList.get(8));
+            if(objectList.get(9) != null){
+                examStudentDTO.setGrade((Float) objectList.get(9));
+            } else {
+                examStudentDTO.setGrade(null);
+            }
 
             examStudentDTOList.add(examStudentDTO);
         }
