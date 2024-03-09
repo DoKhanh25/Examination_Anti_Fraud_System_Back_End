@@ -85,7 +85,6 @@ public class AuthenticationService {
         resultDTO.setMessage("success");
 
         return new ResponseEntity<>(resultDTO, HttpStatus.OK);
-
     }
 
     public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO){
@@ -122,6 +121,28 @@ public class AuthenticationService {
         }
     }
 
+    public ResponseEntity<?> changePassword(ChangePasswordDTO changePasswordDTO){
+        ResultDTO resultDTO = new ResultDTO();
+        UserEntity userEntity = userRepository.findByUsername(changePasswordDTO.getUsername());
+
+        if(userEntity != null){
+            if(passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), userEntity.getPassword())){
+                userEntity.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+                userRepository.save(userEntity);
+                resultDTO.setErrorCode("0");
+                resultDTO.setMessage("Thành công");
+                return new ResponseEntity<>(resultDTO, HttpStatus.OK);
+            } else {
+                resultDTO.setErrorCode("-1");
+                resultDTO.setMessage("Mật khẩu cũ không đúng");
+                return new ResponseEntity<>(resultDTO, HttpStatus.OK);
+            }
+        } else {
+            resultDTO.setErrorCode("-1");
+            resultDTO.setMessage("user not found");
+            return new ResponseEntity<>(resultDTO, HttpStatus.OK);
+        }
+    }
 
 
 

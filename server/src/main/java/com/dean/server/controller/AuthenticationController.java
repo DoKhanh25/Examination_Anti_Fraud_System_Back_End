@@ -1,5 +1,6 @@
 package com.dean.server.controller;
 
+import com.dean.server.dto.ChangePasswordDTO;
 import com.dean.server.dto.ExamPostDTO;
 import com.dean.server.dto.LoginRequestDTO;
 import com.dean.server.dto.RegisterDTO;
@@ -22,6 +23,9 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO){
@@ -33,6 +37,20 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO){
         logger.info("Logging in user: " + loginRequestDTO.getUsername());
         return authenticationService.login(loginRequestDTO);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordDTO changePasswordDTO,
+            HttpServletRequest request){
+        String username = jwtUtil.extractUsername(jwtUtil.getToken(request));
+
+        if(!username.equals(changePasswordDTO.getUsername())){
+            return ResponseEntity.status(403).body("You are not authorized to access this resource");
+        }
+
+        logger.info("Changing password for user: " + changePasswordDTO.getUsername());
+        return authenticationService.changePassword(changePasswordDTO);
     }
 
 
